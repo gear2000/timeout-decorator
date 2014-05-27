@@ -11,6 +11,7 @@ from __future__ import unicode_literals
 from __future__ import division
 
 import signal
+import os
 
 ############################################################
 # Timeout
@@ -24,12 +25,15 @@ class TimeoutError(Exception):
     def __str__(self):
         return repr(self.value)
 
-def timeout(seconds_before_timeout):
+#changed seconds_before_timeout to environmental variable
+
+def timeout(var_timeout):
     def decorate(f):
         def handler(signum, frame):
             raise TimeoutError()
         def new_f(*args, **kwargs):
             old = signal.signal(signal.SIGALRM, handler)
+            seconds_before_timeout = os.environ[var_timeout]
             signal.alarm(seconds_before_timeout)
             try:
                 result = f(*args, **kwargs)
