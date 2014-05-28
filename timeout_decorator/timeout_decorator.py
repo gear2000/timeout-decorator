@@ -34,7 +34,7 @@ def timeout_env_var(var_timeout):
             #raise TimeoutError()
         def new_f(*args, **kwargs):
             old = signal.signal(signal.SIGALRM, handler)
-            seconds_before_timeout = os.environ[var_timeout]
+            seconds_before_timeout = int(os.environ[var_timeout])
             signal.alarm(seconds_before_timeout)
             try:
                 result = f(*args, **kwargs)
