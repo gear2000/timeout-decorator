@@ -27,13 +27,32 @@ class TimeoutError(Exception):
 
 #changed seconds_before_timeout to environmental variable
 
-def timeout(var_timeout):
+def timeout_env_var(var_timeout):
     def decorate(f):
         def handler(signum, frame):
-            raise TimeoutError()
+            return 82
+            #raise TimeoutError()
         def new_f(*args, **kwargs):
             old = signal.signal(signal.SIGALRM, handler)
             seconds_before_timeout = os.environ[var_timeout]
+            signal.alarm(seconds_before_timeout)
+            try:
+                result = f(*args, **kwargs)
+            finally:
+                signal.signal(signal.SIGALRM, old)
+            signal.alarm(0)
+            return result
+        new_f.func_name = f.func_name
+        return new_f
+    return decorate
+
+def timeout_secs(seconds_before_timeout):
+    def decorate(f):
+        def handler(signum, frame):
+            return 82
+            #raise TimeoutError()
+        def new_f(*args, **kwargs):
+            old = signal.signal(signal.SIGALRM, handler)
             signal.alarm(seconds_before_timeout)
             try:
                 result = f(*args, **kwargs)
